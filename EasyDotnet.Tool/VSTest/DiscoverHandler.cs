@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
+
 using EasyDotnet.Types;
+
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -10,7 +12,7 @@ namespace EasyDotnet.VSTest;
 
 public static class DiscoverHandler
 {
-  public static List<Test> Discover(string vsTestConsolePath, string testDllPath)
+  public static Dictionary<string, List<DiscoveredTest>> Discover(string vsTestConsolePath, string[] testDllPath)
   {
     var options = new TestPlatformOptions
     {
@@ -21,14 +23,14 @@ public static class DiscoverHandler
     var r = new VsTestConsoleWrapper(vsTestConsolePath);
     var sessionHandler = new TestSessionHandler();
     var discoveryHandler = new PlaygroundTestDiscoveryHandler();
-    r.DiscoverTests([testDllPath], null, options, sessionHandler.TestSessionInfo, discoveryHandler);
-    var tests = discoveryHandler.TestCases.Select(x => x.Map()).ToList();
-    return tests;
+    r.DiscoverTests(testDllPath, null, options, sessionHandler.TestSessionInfo, discoveryHandler);
+
+    return discoveryHandler.TestCases.GroupBy(x => x.Source).ToDictionary(x => x.Key, y => y.Select(x => x.ToDiscoveredTest()).ToList());
   }
+}
 
   public class PlaygroundTestDiscoveryHandler() : ITestDiscoveryEventsHandler, ITestDiscoveryEventsHandler2
   {
-
     public List<TestCase> TestCases { get; internal set; } = [];
 
     public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
@@ -48,5 +50,4 @@ public static class DiscoverHandler
 
     public void HandleLogMessage(TestMessageLevel level, string message) { }
     public void HandleRawMessage(string rawMessage) { }
-  }
 }

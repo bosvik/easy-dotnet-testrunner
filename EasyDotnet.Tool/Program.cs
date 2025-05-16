@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO.Pipes;
 using System.Linq;
 using System.Reflection;
@@ -16,7 +15,7 @@ class Program
   {
     if(args.Contains("-v")){
       var assembly = Assembly.GetExecutingAssembly();
-      var version = assembly.GetName().Version; // AssemblyVersion
+      var version = assembly.GetName().Version;
       Console.WriteLine($"Assembly Version: {version}");
       return 0;
     }
@@ -41,11 +40,11 @@ class Program
   private static async Task RespondToRpcRequestsAsync(NamedPipeServerStream stream, int clientId)
   {
     var jsonRpc = JsonRpc.Attach(stream, new Server());
-    if(true == true){
-      var ts = jsonRpc.TraceSource;
-      ts.Switch.Level = SourceLevels.Verbose;
-      ts.Listeners.Add(new ConsoleTraceListener());
-    }
+    // if(true == true){
+    //   var ts = jsonRpc.TraceSource;
+    //   ts.Switch.Level = SourceLevels.Verbose;
+    //   ts.Listeners.Add(new ConsoleTraceListener());
+    // }
     jsonRpc.StartListening();
     await Console.Error.WriteLineAsync($"JSON-RPC listener attached to #{clientId}. Waiting for requests...");
     await jsonRpc.Completion;

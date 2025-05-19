@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO.Pipes;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
 using EasyDotnet.Server;
+
+using Microsoft.Build.Locator;
+
+using Newtonsoft.Json.Serialization;
 
 using StreamJsonRpc;
 
@@ -19,6 +24,10 @@ class Program
       var version = assembly.GetName().Version;
       Console.WriteLine($"Assembly Version: {version}");
       return 0;
+    }
+    if (!MSBuildLocator.IsRegistered)
+    {
+        MSBuildLocator.RegisterDefaults();
     }
 
     await StartServerAsync();
@@ -40,9 +49,17 @@ class Program
 
   private static async Task RespondToRpcRequestsAsync(NamedPipeServerStream stream, int clientId)
   {
-    var jsonRpc = JsonRpc.Attach(stream, new Server());
+
+    var jsonMessageFormatter = new JsonMessageFormatter();
+    jsonMessageFormatter.JsonSerializer.ContractResolver = new DefaultContractResolver
+    {
+        NamingStrategy = new CamelCaseNamingStrategy()
+    };
+
+    var handler = new HeaderDelimitedMessageHandler(stream, stream, jsonMessageFormatter);
+    var jsonRpc = new JsonRpc(handler, new Server());
     // if(true == true){
-    //   var ts = jsonRpc.TraceSource;
+    //   var ts = rpc.TraceSource;
     //   ts.Switch.Level = SourceLevels.Verbose;
     //   ts.Listeners.Add(new ConsoleTraceListener());
     // }

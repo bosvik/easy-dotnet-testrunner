@@ -41,6 +41,19 @@
 
 ---
 
+## RoslynController
+
+### `roslyn/bootstrap-file`
+| Parameter | Type | Optional |
+|-----------|------|----------|
+| filePath | string |   |
+| kind | Kind |   |
+| preferFileScopedNamespace | bool |   |
+
+**Returns:** `Task<BootstrapFileResultResponse>`
+
+---
+
 ## OutdatedController
 
 ### `outdated/packages`

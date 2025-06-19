@@ -15,6 +15,11 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+         
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
 
       - name: Restore dependencies
         run: dotnet restore
@@ -22,10 +27,16 @@ jobs:
       - name: Build
         run: dotnet build -c Release --no-restore
 
+      - name: Resolve version
+        id: get_version
+        run: |
+          VERSION=$(dotnet msbuild ./EasyDotnet.Tool/EasyDotnet.csproj -getProperty:Version)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
       - name: Pack with prerelease suffix
         run: |
           dotnet pack -c Release --no-build \
-            /p:VersionSuffix=${{ github.event.inputs.versionSuffix }}
+            -p:PackageVersion=${{ steps.get_version.outputs.version }}-${{ github.event.inputs.versionSuffix }}
 
       - name: Push to NuGet (ignore conflict errors)
         run: |

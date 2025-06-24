@@ -6,7 +6,7 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>dotnet-easydotnet</ToolCommandName>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>1.0.4</Version>
+    <Version>1.0.5</Version>
     <Authors>Gustav Eikaas</Authors>
     <PackageId>EasyDotnet</PackageId>
     <Nullable>enable</Nullable>
@@ -14,6 +14,16 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <IncludePackageReadmeFile>true</IncludePackageReadmeFile>
   </PropertyGroup>
+  <PropertyGroup>
+    <MsBuildSdkSource>..\EasyDotnet.MsBuildSdk\bin\Release\net8.0\**\*</MsBuildSdkSource>
+  </PropertyGroup>
+
+  <Target Name="CopyAndIncludeSdkFiles" AfterTargets="Build">
+    <ItemGroup>
+      <None Include="$(MsBuildSdkSource)" Pack="true" PackagePath="tools/net8.0/any/MsBuildSdk" />
+    </ItemGroup>
+  </Target>
+
   <ItemGroup>
     <None Include="..\LICENSE" Pack="true" PackagePath="" />
     <None Include="..\README.md" Pack="true" PackagePath="" />
@@ -33,5 +43,8 @@
     <PackageReference Include="NuGet.Configuration" Version="6.14.0" />
     <PackageReference Include="NuGet.Protocol" Version="6.14.0" />
     <PackageReference Include="StreamJsonRpc" Version="2.21.69" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EasyDotnet.MsBuild.Contracts\EasyDotnet.MsBuild.Contracts.csproj" />
   </ItemGroup>
 </Project>

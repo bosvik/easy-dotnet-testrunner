@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 
 using EasyDotnet;
+using EasyDotnet.Utils;
 
 class Program
 {
@@ -13,6 +14,7 @@ class Program
 
   public static async Task<int> Main(string[] args)
   {
+    HostDirectoryUtil.HostDirectory = Directory.GetCurrentDirectory();
     if (args.Contains("-v"))
     {
       var assembly = Assembly.GetExecutingAssembly();

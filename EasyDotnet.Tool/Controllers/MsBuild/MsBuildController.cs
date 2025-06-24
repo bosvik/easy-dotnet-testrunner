@@ -4,17 +4,14 @@ using StreamJsonRpc;
 
 namespace EasyDotnet.Controllers.MsBuild;
 
-public class MsBuildController(ClientService clientService, MsBuildService msBuild, OutFileWriterService outFileWriterService) : BaseController
+public class MsBuildController(ClientService clientService, MsBuildService msBuild) : BaseController
 {
   [JsonRpcMethod("msbuild/build")]
   public async Task<BuildResultResponse> Build(BuildRequest request)
   {
     clientService.ThrowIfNotInitialized();
+    var result = await msBuild.RequestBuildAsync(request.TargetPath, request.ConfigurationOrDefault);
 
-    var buildResult = await msBuild.RequestBuildAsync(request.TargetPath, request.ConfigurationOrDefault);
-
-    return new BuildResultResponse(buildResult);
+    return new(result.Success);
   }
-
-
 }

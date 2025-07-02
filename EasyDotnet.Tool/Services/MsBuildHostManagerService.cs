@@ -27,7 +27,9 @@ public interface IMsBuildHostManager
 
 public class MsBuildHostManager : IMsBuildHostManager, IDisposable
 {
-  private const int MaxPipeNameLength = 103;
+  // on macOS the temp path is long. Total length of pipename must be no longer that 104 characters
+  // the path /{tmpPath}/CoreFxPipe is exactly 60 characters. MaxPipeNameLength must be 44
+  private const int MaxPipeNameLength = 44;
   private readonly string _sdk_Pipe = GeneratePipeName(BuildClientType.Sdk);
   private readonly string _framework_Pipe = GeneratePipeName(BuildClientType.Framework);
 

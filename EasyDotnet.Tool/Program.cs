@@ -62,7 +62,7 @@ class Program
   {
     var pipeName = "EasyDotnet_" + Regex.Replace(Convert.ToBase64String(Guid.NewGuid().ToByteArray()), "[/+=]", "");
     var maxNameLength = MaxPipeNameLength - Path.GetTempPath().Length;
-    return pipeName[..Math.Min(pipeName.Length, MaxPipeNameLength)];
+    return pipeName[..Math.Min(pipeName.Length, maxNameLength)];
   }
 
   private static async Task RespondToRpcRequestsAsync(Stream stream, int clientId)

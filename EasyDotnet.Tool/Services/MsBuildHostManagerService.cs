@@ -27,9 +27,7 @@ public interface IMsBuildHostManager
 
 public class MsBuildHostManager : IMsBuildHostManager, IDisposable
 {
-  // on macOS the temp path is long. Total length of pipename must be no longer that 104 characters
-  // the path /{tmpPath}/CoreFxPipe is exactly 60 characters. MaxPipeNameLength must be 44
-  private const int MaxPipeNameLength = 44;
+  private const int MaxPipeNameLength = 103;
   private readonly string _sdk_Pipe = GeneratePipeName(BuildClientType.Sdk);
   private readonly string _framework_Pipe = GeneratePipeName(BuildClientType.Framework);
 
@@ -54,7 +52,7 @@ public class MsBuildHostManager : IMsBuildHostManager, IDisposable
     var pipePrefix = "EasyDotnet_MSBuild_";
     var uid = Regex.Replace(Convert.ToBase64String(Guid.NewGuid().ToByteArray()), "[/+=]", "");
     var name = $"{pipePrefix}{type}_{uid}";
-    return name[..Math.Min(name.Length, MaxPipeNameLength)];
+    return name[..Math.Min(Path.GetTempPath().Length + name.Length, MaxPipeNameLength)];
   }
 
   public void StopAll()

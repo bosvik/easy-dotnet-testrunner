@@ -11,7 +11,7 @@ using EasyDotnet.Utils;
 
 class Program
 {
-  private static readonly string PipeName = "EasyDotnet_" + Regex.Replace(Convert.ToBase64String(Guid.NewGuid().ToByteArray()), "[/+=]", "");
+  private const int MaxPipeNameLength = 103;
 
   public static async Task<int> Main(string[] args)
   {
@@ -46,6 +46,8 @@ class Program
 
   private static async Task StartServerAsync()
   {
+    var PipeName = GeneratePipeName();
+
     var clientId = 0;
     while (true)
     {
@@ -54,6 +56,12 @@ class Program
       await stream.WaitForConnectionAsync();
       _ = RespondToRpcRequestsAsync(stream, ++clientId);
     }
+  }
+
+  private static string GeneratePipeName()
+  {
+    var pipeName = "EasyDotnet_" + Regex.Replace(Convert.ToBase64String(Guid.NewGuid().ToByteArray()), "[/+=]", "");
+    return pipeName[..Math.Min(Path.GetTempPath().Length + pipeName.Length, MaxPipeNameLength)];
   }
 
   private static async Task RespondToRpcRequestsAsync(Stream stream, int clientId)

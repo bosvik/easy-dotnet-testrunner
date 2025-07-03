@@ -50,12 +50,11 @@ public class RoslynService(RoslynProjectMetadataCache cache)
 
     MemberDeclarationSyntax nsDeclaration = useFileScopedNs
         ? SyntaxFactory.FileScopedNamespaceDeclaration(SyntaxFactory.ParseName(fullNamespace))
-            .AddMembers(typeDecl)
-        : SyntaxFactory.NamespaceDeclaration(SyntaxFactory.ParseName(fullNamespace))
-            .AddMembers(typeDecl);
+        : SyntaxFactory.NamespaceDeclaration(SyntaxFactory.ParseName(fullNamespace));
 
     var unit = SyntaxFactory.CompilationUnit()
       .AddMembers(nsDeclaration)
+      .AddMembers(typeDecl)
       .NormalizeWhitespace(eol: Environment.NewLine);
 
     if (preferFileScopedNamespace)

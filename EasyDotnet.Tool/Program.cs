@@ -11,7 +11,7 @@ using EasyDotnet.Utils;
 
 class Program
 {
-  private const int MaxPipeNameLength = 103;
+  private const int MaxPipeNameLength = 104;
 
   public static async Task<int> Main(string[] args)
   {
@@ -60,8 +60,9 @@ class Program
 
   private static string GeneratePipeName()
   {
+    var pipePrefix = "CoreFxPipe_";
     var pipeName = "EasyDotnet_" + Regex.Replace(Convert.ToBase64String(Guid.NewGuid().ToByteArray()), "[/+=]", "");
-    var maxNameLength = MaxPipeNameLength - Path.GetTempPath().Length;
+    var maxNameLength = MaxPipeNameLength - Path.GetTempPath().Length - pipePrefix.Length - 1;
     return pipeName[..Math.Min(pipeName.Length, maxNameLength)];
   }
 

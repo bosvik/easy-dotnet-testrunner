@@ -58,6 +58,11 @@ public class RoslynService(RoslynProjectMetadataCache cache)
       .AddMembers(nsDeclaration)
       .NormalizeWhitespace(eol: Environment.NewLine);
 
+    if (preferFileScopedNamespace)
+    {
+      unit = AddCarriageReturnLineFeed(unit);
+    }
+
     if (File.Exists(filePath) && new FileInfo(filePath).Length > 0)
     {
       return false;
@@ -67,6 +72,22 @@ public class RoslynService(RoslynProjectMetadataCache cache)
     File.WriteAllText(filePath, unit.ToFullString());
 
     return true;
+  }
+
+  private static CompilationUnitSyntax AddCarriageReturnLineFeed(CompilationUnitSyntax unit)
+  {
+    var oldNode = unit.DescendantNodes().First();
+    if (oldNode is null)
+    {
+      return unit;
+    }
+
+    var newNode = oldNode.WithTrailingTrivia(
+        SyntaxFactory.ElasticCarriageReturnLineFeed,
+        SyntaxFactory.ElasticCarriageReturnLineFeed
+    );
+
+    return unit.ReplaceNode(oldNode, newNode);
   }
 
   private static string FindCsprojFromFile(string filePath)

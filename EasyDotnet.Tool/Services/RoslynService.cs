@@ -8,6 +8,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.MSBuild;
+using EasyDotnet.Extensions;
 
 namespace EasyDotnet.Services;
 
@@ -59,7 +60,7 @@ public class RoslynService(RoslynProjectMetadataCache cache)
 
     if (preferFileScopedNamespace)
     {
-      unit = AddNewLinesAfterNamespaceDeclaration(unit);
+      unit = unit.AddNewLinesAfterNamespaceDeclaration();
     }
 
     if (File.Exists(filePath) && new FileInfo(filePath).Length > 0)
@@ -71,22 +72,6 @@ public class RoslynService(RoslynProjectMetadataCache cache)
     File.WriteAllText(filePath, unit.ToFullString());
 
     return true;
-  }
-
-  private static CompilationUnitSyntax AddNewLinesAfterNamespaceDeclaration(CompilationUnitSyntax unit)
-  {
-    var oldNode = unit.DescendantNodes().First();
-    if (oldNode is null)
-    {
-      return unit;
-    }
-
-    var newNode = oldNode.WithTrailingTrivia(
-        SyntaxFactory.LineFeed,
-        SyntaxFactory.LineFeed
-    );
-
-    return unit.ReplaceNode(oldNode, newNode);
   }
 
   private static string FindCsprojFromFile(string filePath)

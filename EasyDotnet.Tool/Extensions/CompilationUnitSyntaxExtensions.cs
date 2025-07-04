@@ -9,7 +9,7 @@ public static class CompilationUnitSyntaxExtensions
 {
   public static CompilationUnitSyntax AddNewLinesAfterNamespaceDeclaration(this CompilationUnitSyntax input)
   {
-    var oldNode = input.DescendantNodes().FirstOrDefault();
+    var oldNode = input.DescendantNodes().OfType<FileScopedNamespaceDeclarationSyntax>().FirstOrDefault();
     if (oldNode is null)
     {
       return input;

@@ -59,7 +59,7 @@ public class RoslynService(RoslynProjectMetadataCache cache)
 
     if (preferFileScopedNamespace)
     {
-      unit = AddCarriageReturnLineFeed(unit);
+      unit = AddNewLinesAfterNamespaceDeclaration(unit);
     }
 
     if (File.Exists(filePath) && new FileInfo(filePath).Length > 0)
@@ -73,7 +73,7 @@ public class RoslynService(RoslynProjectMetadataCache cache)
     return true;
   }
 
-  private static CompilationUnitSyntax AddCarriageReturnLineFeed(CompilationUnitSyntax unit)
+  private static CompilationUnitSyntax AddNewLinesAfterNamespaceDeclaration(CompilationUnitSyntax unit)
   {
     var oldNode = unit.DescendantNodes().First();
     if (oldNode is null)
@@ -82,8 +82,8 @@ public class RoslynService(RoslynProjectMetadataCache cache)
     }
 
     var newNode = oldNode.WithTrailingTrivia(
-        SyntaxFactory.ElasticCarriageReturnLineFeed,
-        SyntaxFactory.ElasticCarriageReturnLineFeed
+        SyntaxFactory.LineFeed,
+        SyntaxFactory.LineFeed
     );
 
     return unit.ReplaceNode(oldNode, newNode);

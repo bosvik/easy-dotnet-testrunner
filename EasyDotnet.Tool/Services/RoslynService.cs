@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EasyDotnet.Controllers.Roslyn;
+using EasyDotnet.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -50,13 +51,17 @@ public class RoslynService(RoslynProjectMetadataCache cache)
 
     MemberDeclarationSyntax nsDeclaration = useFileScopedNs
         ? SyntaxFactory.FileScopedNamespaceDeclaration(SyntaxFactory.ParseName(fullNamespace))
-            .AddMembers(typeDecl)
-        : SyntaxFactory.NamespaceDeclaration(SyntaxFactory.ParseName(fullNamespace))
-            .AddMembers(typeDecl);
+        : SyntaxFactory.NamespaceDeclaration(SyntaxFactory.ParseName(fullNamespace));
 
     var unit = SyntaxFactory.CompilationUnit()
       .AddMembers(nsDeclaration)
+      .AddMembers(typeDecl)
       .NormalizeWhitespace(eol: Environment.NewLine);
+
+    if (preferFileScopedNamespace)
+    {
+      unit = unit.AddNewLinesAfterNamespaceDeclaration();
+    }
 
     if (File.Exists(filePath) && new FileInfo(filePath).Length > 0)
     {

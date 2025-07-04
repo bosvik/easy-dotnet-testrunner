@@ -29,19 +29,19 @@ public class BootstrapTests
     switch (kind)
     {
       case Kind.Record:
-        var recordDecl = ns.DescendantNodes().OfType<RecordDeclarationSyntax>().SingleOrDefault();
+        var recordDecl = await GetNode<RecordDeclarationSyntax>(res.SyntaxTree);
         Assert.NotNull(recordDecl);
         Assert.Equal("MyController", recordDecl.Identifier.Text);
         break;
 
       case Kind.Class:
-        var classDecl = ns.DescendantNodes().OfType<ClassDeclarationSyntax>().SingleOrDefault();
+        var classDecl = await GetNode<ClassDeclarationSyntax>(res.SyntaxTree);
         Assert.NotNull(classDecl);
         Assert.Equal("MyController", classDecl.Identifier.Text);
         break;
 
       case Kind.Interface:
-        var interfaceDecl = ns.DescendantNodes().OfType<InterfaceDeclarationSyntax>().SingleOrDefault();
+        var interfaceDecl = await GetNode<InterfaceDeclarationSyntax>(res.SyntaxTree);
         Assert.NotNull(interfaceDecl);
         Assert.Equal("IMyController", interfaceDecl.Identifier.Text);
         break;
@@ -89,6 +89,12 @@ public class BootstrapTests
     var root = await syntaxTree.GetRootAsync();
     var namespaceDecl = root.DescendantNodes().OfType<FileScopedNamespaceDeclarationSyntax>().SingleOrDefault();
     return namespaceDecl;
+  }
+
+  private static async Task<T?> GetNode<T>(SyntaxTree syntaxTree) where T : SyntaxNode
+  {
+    var root = await syntaxTree.GetRootAsync();
+    return root.DescendantNodes().OfType<T>().SingleOrDefault();
   }
 
   private static (TempDotNetProject Project, string ControllerFilePath) CreateDummyProjectWithFreshFile(string filename)

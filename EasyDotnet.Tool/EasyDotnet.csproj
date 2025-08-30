@@ -6,7 +6,7 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>dotnet-easydotnet</ToolCommandName>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>1.0.21</Version>
+    <Version>1.0.22</Version>
     <Authors>Gustav Eikaas</Authors>
     <PackageId>EasyDotnet</PackageId>
     <Nullable>enable</Nullable>
@@ -14,16 +14,6 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <IncludePackageReadmeFile>true</IncludePackageReadmeFile>
   </PropertyGroup>
-  <PropertyGroup>
-    <MsBuildSdkSource>..\EasyDotnet.MsBuildSdk\bin\Release\net8.0\**\*</MsBuildSdkSource>
-  </PropertyGroup>
-
-  <Target Name="CopyAndIncludeSdkFiles" AfterTargets="Build">
-    <ItemGroup>
-      <None Include="$(MsBuildSdkSource)" Pack="true" PackagePath="tools/net8.0/any/MsBuildSdk" />
-    </ItemGroup>
-  </Target>
-
   <ItemGroup>
     <None Include="..\LICENSE" Pack="true" PackagePath="" />
     <None Include="..\README.md" Pack="true" PackagePath="" />
@@ -33,6 +23,7 @@
     <PackageReference Include="Microsoft.CodeAnalysis" Version="4.13.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.13.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.13.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.8" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.6" />
     <PackageReference Include="Microsoft.TestPlatform.TranslationLayer" Version="17.13.0" />
     <PackageReference Include="Microsoft.TemplateEngine.Edge" Version="9.0.304" />
@@ -45,11 +36,9 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NJsonSchema" Version="11.3.2" />
     <PackageReference Include="NJsonSchema.CodeGeneration.CSharp" Version="11.3.2" />
+    <PackageReference Include="Microsoft.Build.Locator" Version="1.9.1" />
     <PackageReference Include="NuGet.Configuration" Version="6.14.0" />
     <PackageReference Include="NuGet.Protocol" Version="6.14.0" />
     <PackageReference Include="StreamJsonRpc" Version="2.21.69" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\EasyDotnet.MsBuild.Contracts\EasyDotnet.MsBuild.Contracts.csproj" />
   </ItemGroup>
 </Project>

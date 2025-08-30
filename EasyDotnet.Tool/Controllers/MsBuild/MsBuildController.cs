@@ -10,7 +10,7 @@ public class MsBuildController(ClientService clientService, MsBuildService msBui
   public async Task<BuildResultResponse> Build(BuildRequest request)
   {
     clientService.ThrowIfNotInitialized();
-    var result = await msBuild.RequestBuildAsync(request.TargetPath, request.ConfigurationOrDefault);
+    var result = await msBuild.RequestBuildAsync(request.TargetPath, request.TargetFramework, request.ConfigurationOrDefault);
 
     return new(result.Success);
   }

@@ -14,8 +14,10 @@ public static class DiModules
   public static ServiceProvider BuildServiceProvider(JsonRpc jsonRpc, SourceLevels levels)
   {
     var services = new ServiceCollection();
+    services.AddMemoryCache();
     services.AddSingleton(jsonRpc);
     services.AddSingleton<ClientService>();
+    services.AddSingleton<VisualStudioLocator>();
 
     services.AddTransient<MsBuildService>();
     services.AddTransient<UserSecretsService>();
@@ -29,7 +31,6 @@ public static class DiModules
     services.AddSingleton<RoslynService>();
     services.AddSingleton<TemplateEngineService>();
     services.AddSingleton<RoslynProjectMetadataCache>();
-    services.AddSingleton<IMsBuildHostManager, MsBuildHostManager>();
     services.AddSingleton(new LogService(levels, jsonRpc));
 
     //Dotnet oudated

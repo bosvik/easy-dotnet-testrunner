@@ -25,8 +25,6 @@ public class RoslynController(RoslynService roslynService) : BaseController
   }
 
   [JsonRpcMethod("roslyn/get-workspace-diagnostics")]
-  public IAsyncEnumerable<DiagnosticMessage> GetDiagnostics(string projectPath, bool includeWarnings = false)
-  {
-    return roslynService.GetWorkspaceDiagnosticsAsync(projectPath, includeWarnings);
-  }
+  public IAsyncEnumerable<DiagnosticMessage> GetDiagnostics(string projectPath, bool includeWarnings = false) =>
+    roslynService.GetWorkspaceDiagnosticsAsync(projectPath, includeWarnings);
 }

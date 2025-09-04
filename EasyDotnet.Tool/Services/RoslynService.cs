@@ -329,11 +329,9 @@ public class RoslynService(RoslynProjectMetadataCache cache)
     }
   }
 
-  private static bool ShouldIncludeDiagnostic(Diagnostic diagnostic, bool includeWarnings)
-  {
-    return diagnostic.Severity == DiagnosticSeverity.Error ||
-           (includeWarnings && diagnostic.Severity == DiagnosticSeverity.Warning);
-  }
+  private static bool ShouldIncludeDiagnostic(Diagnostic diagnostic, bool includeWarnings) =>
+    diagnostic.Severity == DiagnosticSeverity.Error ||
+    (includeWarnings && diagnostic.Severity == DiagnosticSeverity.Warning);
 
   private static int MapSeverity(DiagnosticSeverity severity) => severity switch
   {

@@ -6,20 +6,22 @@ namespace EasyDotnet.IntegrationTests.Roslyn;
 public class DiagnosticsTests
 {
   private async Task<List<DiagnosticMessage>> GetDiagnosticsAsync(
-    string projectPath,
-    bool includeWarnings = false)
+    string targetPath,
+    bool includeWarnings = false,
+    CancellationToken cancellationToken = default)
   {
     using var server = await RpcTestServerInstantiator.GetInitializedStreamServer();
 
-    var request = new { projectPath, includeWarnings };
+    var request = new { targetPath, includeWarnings };
 
     var diagnosticsStream = await server.InvokeWithParameterObjectAsync<IAsyncEnumerable<DiagnosticMessage>>(
       "roslyn/get-workspace-diagnostics",
-      request
+      request,
+      cancellationToken
     );
 
     var diagnostics = new List<DiagnosticMessage>();
-    await foreach (var diagnostic in diagnosticsStream)
+    await foreach (var diagnostic in diagnosticsStream.WithCancellation(cancellationToken))
     {
       diagnostics.Add(diagnostic);
     }
@@ -30,8 +32,9 @@ public class DiagnosticsTests
   public async Task GetDiagnostics_WithErrors_ReturnsErrorDiagnostics()
   {
     using var tempProject = new TempDotNetProjectWithError();
+    using var cts = new CancellationTokenSource();
 
-    var diagnostics = await GetDiagnosticsAsync(tempProject.CsprojPath);
+    var diagnostics = await GetDiagnosticsAsync(tempProject.CsprojPath, false, cts.Token);
 
     Assert.NotEmpty(diagnostics);
 
@@ -48,12 +51,13 @@ public class DiagnosticsTests
   public async Task GetDiagnostics_WithWarnings_ReturnsWarningsWhenRequested()
   {
     using var tempProject = new TempDotNetProjectWithWarning();
+    using var cts = new CancellationTokenSource();
 
-    var diagnosticsWithoutWarnings = await GetDiagnosticsAsync(tempProject.CsprojPath);
+    var diagnosticsWithoutWarnings = await GetDiagnosticsAsync(tempProject.CsprojPath, false, cts.Token);
     var warningDiagnostic = diagnosticsWithoutWarnings.FirstOrDefault(d => d.Code == "CS0219");
     Assert.Null(warningDiagnostic);
 
-    var diagnosticsWithWarnings = await GetDiagnosticsAsync(tempProject.CsprojPath, includeWarnings: true);
+    var diagnosticsWithWarnings = await GetDiagnosticsAsync(tempProject.CsprojPath, includeWarnings: true, cts.Token);
     warningDiagnostic = diagnosticsWithWarnings.FirstOrDefault(d => d.Code == "CS0219");
     Assert.NotNull(warningDiagnostic);
     Assert.Equal(2, warningDiagnostic.Severity);
@@ -64,8 +68,9 @@ public class DiagnosticsTests
   public async Task GetDiagnostics_ValidProject_ReturnsCorrectPositions()
   {
     using var tempProject = new TempDotNetProjectWithError();
+    using var cts = new CancellationTokenSource();
 
-    var diagnostics = await GetDiagnosticsAsync(tempProject.CsprojPath, includeWarnings: true);
+    var diagnostics = await GetDiagnosticsAsync(tempProject.CsprojPath, includeWarnings: true, cts.Token);
     var errorDiagnostic = diagnostics.FirstOrDefault(d => d.Code == "CS0103");
 
     Assert.NotNull(errorDiagnostic);
@@ -83,8 +88,9 @@ public class DiagnosticsTests
   public async Task GetDiagnostics_WithSolutionFile_ReturnsAllProjectDiagnostics()
   {
     using var tempSolution = new TempDotNetSolution();
+    using var cts = new CancellationTokenSource();
 
-    var diagnostics = await GetDiagnosticsAsync(tempSolution.SolutionPath);
+    var diagnostics = await GetDiagnosticsAsync(tempSolution.SolutionPath, false, cts.Token);
     Assert.NotEmpty(diagnostics);
 
     var project1Errors = diagnostics.Where(d => d.FilePath.Contains("Project1")).ToList();

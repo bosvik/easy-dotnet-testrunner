@@ -16,7 +16,7 @@ namespace EasyDotnet.Services;
 
 public sealed record VariableResult(string Identifier, int LineStart, int LineEnd, int ColumnStart, int ColumnEnd);
 
-public class RoslynService(RoslynProjectMetadataCache cache)
+public class RoslynService(RoslynProjectMetadataCache cache, LogService logService)
 {
   private async Task<ProjectCacheItem> GetOrSetProjectFromCache(string projectPath, CancellationToken cancellationToken)
   {
@@ -290,7 +290,7 @@ public class RoslynService(RoslynProjectMetadataCache cache)
           var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
           if (semanticModel == null) return;
 
-          var diagnostics = semanticModel.GetDiagnostics();
+          var diagnostics = semanticModel.GetDiagnostics(cancellationToken: cancellationToken);
 
           foreach (var diagnostic in diagnostics)
           {
@@ -314,9 +314,9 @@ public class RoslynService(RoslynProjectMetadataCache cache)
             await writer.WriteAsync(diagnosticMessage, cancellationToken).ConfigureAwait(false);
           }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-          // Skip documents that fail to load
+          logService.Warning($"Failed to load document '{document.FilePath}': {ex.Message}");
         }
       });
 
